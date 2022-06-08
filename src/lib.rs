@@ -80,9 +80,10 @@ impl Redlock {
                 value: l.val,
                 validity_time: l.validity_time,
             }),
-            None => Err(PhpException::from_class::<FailedToAcquireLock>(
-                format!("Failed to acquire lock for resource: {}", resource).into(),
-            )),
+            None => Err(PhpException::from_class::<FailedToAcquireLock>(format!(
+                "Failed to acquire lock for resource: {}",
+                resource
+            ))),
         }
     }
 
@@ -99,15 +100,16 @@ impl Redlock {
             match result {
                 Ok(val) => return Ok(val),
                 Err(err) => {
-                    return Err(PhpException::from_class::<FailedToUnlock>(
-                        format!("Failed to unlock resource: {}", err).into(),
-                    ))
+                    return Err(PhpException::from_class::<FailedToUnlock>(format!(
+                        "Failed to unlock resource: {}",
+                        err
+                    )))
                 }
             };
         }
 
         Err(PhpException::from_class::<FailedToUnlock>(
-            format!("Failed to unlock resource: no matching key on all servers").into(),
+            "Failed to unlock resource: no matching key on all servers".to_string(),
         ))
     }
 }
