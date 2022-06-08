@@ -1,0 +1,16 @@
+[package]
+name = "ext-redlock-php"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cargo-php = "*"
+ext-php-rs = "0.7"
+redis = "0.21.0"
+redlock = "1.2"
+
+[lib]
+name = "ext_redlock_php"
+crate-type = ["cdylib"]
