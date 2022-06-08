@@ -86,7 +86,7 @@ impl Redlock {
         }
     }
 
-    pub fn unlock(&self, lock: LockResource) -> Result<i32, PhpException> {
+    pub fn unlock(&self, lock: &LockResource) -> Result<i32, PhpException> {
         for client in &self.client.servers {
             // we don't really care about a server down.
             let mut con = match client.get_connection() {
@@ -97,10 +97,12 @@ impl Redlock {
             let result: RedisResult<i32> =
                 script.key(&lock.resource).arg(&lock.value).invoke(&mut con);
             match result {
-                Ok(val) => Ok(val),
-                Err(err) => Err(PhpException::from_class::<FailedToUnlock>(
-                    format!("Failed to unlock resource: {}", err).into(),
-                )),
+                Ok(val) => return Ok(val),
+                Err(err) => {
+                    return Err(PhpException::from_class::<FailedToUnlock>(
+                        format!("Failed to unlock resource: {}", err).into(),
+                    ))
+                }
             };
         }
 
