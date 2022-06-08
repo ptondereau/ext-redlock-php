@@ -10,15 +10,15 @@ const UNLOCK_SCRIPT: &str = r"if redis.call('get',KEYS[1]) == ARGV[1] then
                                 return 0
                               end";
 
-#[php_class(name = "Ptondereau\\Redlock\\Exception\\FailedToAcquireLock")]
+#[php_class(name = "RustPHP\\Extension\\Redlock\\Exception\\FailedToAcquireLock")]
 #[extends(ce::exception())]
 pub struct FailedToAcquireLock;
 
-#[php_class(name = "Ptondereau\\Redlock\\Exception\\FailedToUnlock")]
+#[php_class(name = "RustPHP\\Extension\\Redlock\\Exception\\FailedToUnlock")]
 #[extends(ce::exception())]
 pub struct FailedToUnlock;
 
-#[php_class(name = "Ptondereau\\Redlock\\LockResource")]
+#[php_class(name = "RustPHP\\Extension\\Redlock\\LockResource")]
 #[derive(Debug)]
 pub struct LockResource {
     pub resource: Vec<u8>,
@@ -38,10 +38,10 @@ impl LockResource {
     }
 }
 
-#[php_class(name = "Ptondereau\\Redlock\\Redlock")]
+#[php_class(name = "RustPHP\\Extension\\Redlock\\Redlock")]
 #[derive(Debug)]
 pub struct Redlock {
-    instance: RedLockLib,
+    client: RedLockLib,
 }
 
 #[php_impl]
@@ -57,10 +57,10 @@ impl Redlock {
     #[defaults(retry_count = 3, delay = 200)]
     #[constructor]
     pub fn new(servers: Vec<String>, retry_count: i32, delay: i32) -> Self {
-        let mut instance = RedLockLib::new(servers);
-        instance.set_retry(retry_count as u32, delay as u32);
+        let mut client = RedLockLib::new(servers);
+        client.set_retry(retry_count as u32, delay as u32);
 
-        Self { instance }
+        Self { client }
     }
 
     /// Lock a given resource such as a string.
@@ -72,7 +72,7 @@ impl Redlock {
     ///
     /// @return LockResource
     pub fn lock(&self, resource: String, ttl: usize) -> Result<LockResource, PhpException> {
-        let lock = self.instance.lock(resource.as_bytes(), ttl);
+        let lock = self.client.lock(resource.as_bytes(), ttl);
 
         match lock {
             Some(l) => Ok(LockResource {
@@ -87,7 +87,7 @@ impl Redlock {
     }
 
     pub fn unlock(&self, lock: LockResource) -> Result<i32, PhpException> {
-        for client in &self.instance.servers {
+        for client in &self.client.servers {
             // we don't really care about a server down.
             let mut con = match client.get_connection() {
                 Err(_) => continue,
