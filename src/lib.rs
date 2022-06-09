@@ -12,10 +12,12 @@ const UNLOCK_SCRIPT: &str = r"if redis.call('get',KEYS[1]) == ARGV[1] then
 
 #[php_class(name = "RustPHP\\Extension\\Redlock\\Exception\\FailedToAcquireLock")]
 #[extends(ce::exception())]
+#[derive(Default)]
 pub struct FailedToAcquireLock;
 
 #[php_class(name = "RustPHP\\Extension\\Redlock\\Exception\\FailedToUnlock")]
 #[extends(ce::exception())]
+#[derive(Default)]
 pub struct FailedToUnlock;
 
 #[php_class(name = "RustPHP\\Extension\\Redlock\\LockResource")]
@@ -28,8 +30,7 @@ pub struct LockResource {
 
 #[php_impl]
 impl LockResource {
-    #[constructor]
-    pub fn new(resource: String, value: String, validity_time: usize) -> Self {
+    pub fn __construct(resource: String, value: String, validity_time: usize) -> Self {
         Self {
             resource: resource.as_bytes().to_vec(),
             value: value.as_bytes().to_vec(),
@@ -44,21 +45,23 @@ pub struct Redlock {
     client: RedLockLib,
 }
 
-#[php_impl]
+#[php_impl(rename_methods = "camelCase")]
 impl Redlock {
     /// Create a new pool of redis server to distribute the redlock algorithm.
     ///
     /// @param string[] $servers Servers array (e.g: ["redis://127.0.0.1:6380/", ...]).
-    /// @param int $retry_count Retry count defaults to 3.
+    /// @param int $retryCount Retry count defaults to 3.
     /// @param int $delay Retry delay in ms, defaults to 200ms.
     ///
     /// @return Redblock
     #[optional(retry_count, delay)]
     #[defaults(retry_count = 3, delay = 200)]
-    #[constructor]
-    pub fn new(servers: Vec<String>, retry_count: i32, delay: i32) -> Self {
+    pub fn __construct(servers: Vec<String>, retry_count: Option<i32>, delay: Option<i32>) -> Self {
         let mut client = RedLockLib::new(servers);
-        client.set_retry(retry_count as u32, delay as u32);
+
+        if let (Some(d), Some(rc)) = (delay, retry_count) {
+            client.set_retry(rc as u32, d as u32);
+        }
 
         Self { client }
     }
