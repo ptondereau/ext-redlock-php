@@ -14,7 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     name: Build
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - name: Cache Cargo registry
+      uses: actions/cache@v3
+      with:
+        path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+            ${{ runner.os }}-cargo-
     - name: Set up Clang
       uses: egor-tensin/setup-clang@v1
       with:
@@ -32,7 +41,16 @@ jobs:
     name: Coding Style
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - name: Cache Cargo registry
+      uses: actions/cache@v3
+      with:
+        path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+            ${{ runner.os }}-cargo-
     - name: Install clippy
       run: rustup component add clippy
     - name: Run linter (clippy)
