@@ -9,7 +9,7 @@ edition = "2021"
 cargo-php = "*"
 ext-php-rs = "0.7"
 redis = "0.21.0"
-redlock = "1.2"
+redlock = { git = "https://github.com/ptondereau/redlock-rs", rev = "e76d648" }
 
 [lib]
 name = "ext_redlock_php"
