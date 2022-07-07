@@ -1,12 +1,11 @@
 # Redlock algorithm implementation for PHP in Rust
 
-This is currently a WIP project
-
+[![CI](https://github.com/ptondereau/ext-redlock-php/actions/workflows/tests.yml/badge.svg)](https://github.com/ptondereau/ext-redlock-php/actions/workflows/tests.yml)
 
 ## Requirements
 
 - [`cargo-php`](https://crates.io/crates/cargo-php)
-- PHP with `php-dev` installed >= 8.0
+- PHP with `php-dev` installed >= 8.1
 - Rust >= 1.61
 - CLang 5
 
@@ -24,3 +23,8 @@ $ php \
 ## What is redlock?
 
 https://redis.io/docs/reference/patterns/distributed-locks/
+
+
+## TODO
+- [] Build for all supported versions of PHP
+- [] Create release artifacts for all PHP versions and OS plaform.
