@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
     name: Build
     steps:
@@ -33,20 +33,56 @@ jobs:
       - name: Build
         run: cargo build --release --all-features
 
+      - name: Run linter (clippy)
+        run: cargo clippy -- -D warnings
+
       - name: Save built extension into artifcat
         uses: actions/upload-artifact@v3
         with:
           name: ext-redlock-php
           path: target/release/libext_redlock_php.so
 
-  coding-style:
-    name: Coding Style
+  tests:
+    needs: build
     runs-on: ubuntu-latest
+
+    services:
+      redis0:
+        image: redis
+        ports:
+          - 6377:6379
+      redis1:
+        image: redis
+        ports:
+          - 6378:6379
+      redis2:
+        image: redis
+        ports:
+          - 6379:6379
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php-version: ["8.1"]
+
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install clippy
-        run: rustup component add clippy
+      - name: "Setup extension"
+        uses: actions/download-artifact@v3
+        with:
+          name: ext-redlock-php
 
-      - name: Run linter (clippy)
-        run: cargo clippy -- -D warnings
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "${{ matrix.php-version }}"
+          coverage: "none"
+          ini-values: "memory_limit=-1"
+          extensions: mbstring
+
+      - name: "Install dependencies (Composer)"
+        uses: "ramsey/composer-install@v2"
+
+      - name: "Run PHPUnit"
+        run: php -dextension=./libext_redlock_php.so vendor/bin/phpunit
