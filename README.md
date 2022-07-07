@@ -26,5 +26,5 @@ https://redis.io/docs/reference/patterns/distributed-locks/
 
 
 ## TODO
-- [] Build for all supported versions of PHP
-- [] Create release artifacts for all PHP versions and OS plaform.
+- [ ] Build for all supported versions of PHP
+- [ ] Create release artifacts for all PHP versions and OS plaform.
