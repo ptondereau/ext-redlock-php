@@ -31,6 +31,18 @@ impl LockResource {
             validity_time,
         }
     }
+
+    pub fn get_resource(&self) -> String {
+        String::from_utf8_lossy(&self.resource).to_string()
+    }
+
+    pub fn get_value(&self) -> String {
+        String::from_utf8_lossy(&self.value).to_string()
+    }
+
+    pub fn get_validity_time(&self) -> usize {
+        self.validity_time
+    }
 }
 
 #[php_class(name = "RustPHP\\Extension\\Redlock\\Redlock")]
