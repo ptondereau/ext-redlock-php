@@ -85,4 +85,4 @@ jobs:
         uses: "ramsey/composer-install@v2"
 
       - name: "Run PHPUnit"
-        run: php -dextension=libext_redlock_php.so vendor/bin/phpunit
+        run: php -dextension=./libext_redlock_php.so vendor/bin/phpunit
