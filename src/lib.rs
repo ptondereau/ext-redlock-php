@@ -79,7 +79,7 @@ impl Redlock {
                     validity_time: lo.validity_time,
                 }),
                 None => Err(PhpException::new(
-                    format!("Failed to acquire lock for resource: {}", resource).into(),
+                    format!("Failed to acquire lock for resource: {}", resource),
                     0,
                     unsafe { FAILED_TO_ACQUIRE_LOCK.expect("did not set exception ce") },
                 )),
@@ -136,7 +136,7 @@ pub fn startup() {
 /// Used by the `phpinfo()` function and when you run `php -i`.
 pub extern "C" fn php_module_info(_module: *mut ModuleEntry) {
     info_table_start!();
-    info_table_row!("ext-redlock-rs", "enabled");
+    info_table_row!("ext-redlock-php", "enabled");
     info_table_end!();
 }
 
