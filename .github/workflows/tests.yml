@@ -65,6 +65,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: "Setup extension"
+        uses: actions/download-artifact@v3
+        with:
+          name: ext-redlock-php
+
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
@@ -77,7 +82,7 @@ jobs:
         uses: "ramsey/composer-install@v2"
 
       - name: "Run PHPUnit"
-        run: vendor/bin/phpunit
+        run: php -dextention=libext_redlock_php.so vendor/bin/phpunit
 
   coding-style:
     name: Coding Style
